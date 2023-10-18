@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.isUnweighted = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.deleteAll = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
@@ -58,6 +59,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.isUnweighted);
             this.panel1.Controls.Add(this.groupBox1);
             this.panel1.Controls.Add(this.reqCredits);
             this.panel1.Controls.Add(this.label1);
@@ -78,6 +80,17 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1160, 619);
             this.panel1.TabIndex = 0;
+            // 
+            // isUnweighted
+            // 
+            this.isUnweighted.AutoSize = true;
+            this.isUnweighted.Location = new System.Drawing.Point(22, 9);
+            this.isUnweighted.Name = "isUnweighted";
+            this.isUnweighted.Size = new System.Drawing.Size(132, 17);
+            this.isUnweighted.TabIndex = 15;
+            this.isUnweighted.Text = "Check for Unweighted";
+            this.isUnweighted.UseVisualStyleBackColor = true;
+            this.isUnweighted.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -359,6 +372,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.CheckBox isUnweighted;
     }
 }
 

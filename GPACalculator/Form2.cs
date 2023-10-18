@@ -27,18 +27,22 @@ namespace GPACalculator
             switch (s_year)
             {
                 case "Freshman":
+                case "freshman":
                 case "1":
                     year = 1;
                     break;
                 case "Sophomore":
+                case "sophomore":
                 case "2":
                     year = 2;
                     break;
                 case "Junior":
+                case "junior":
                 case "3":
                     year = 3;
                     break;
                 case "Senior":
+                case "senior":
                 case "4":
                     year = 4;
                     break;

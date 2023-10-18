@@ -22,10 +22,10 @@ namespace GPACalculator
 
         private void overallValLabel_Click(object sender, EventArgs e)
         {
-            //do nothing
+            //nothing
         }
 
-        private void creditManagementButton_Click(object sender, EventArgs e)
+        private void openForm2()
         {
             this.Hide();
             Form2 form2 = new Form2();
@@ -34,7 +34,12 @@ namespace GPACalculator
             this.Dispose();
         }
 
-        private void deleteAll_Click(object sender, EventArgs e)
+        private void creditManagementButton_Click(object sender, EventArgs e)
+        {
+            openForm2();
+        }
+
+        private void deleteAllClasses()
         {
             string delMessage = "Are you sure you want to permanently delete every class you have added? You will have to add them all back manually!";
             var confirmResult = MessageBox.Show(delMessage, "Confirm Deletion", MessageBoxButtons.YesNo);
@@ -58,6 +63,11 @@ namespace GPACalculator
             }
         }
 
+        private void deleteAll_Click(object sender, EventArgs e)
+        {
+            deleteAllClasses();
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -65,12 +75,14 @@ namespace GPACalculator
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            //I do not remember what this does
+            //FUCK
         }
 
         private void Load_ListView()
         {
             listView1.Items.Clear();
+
             if (File.Exists("UserSaved.xml"))
             {
                 List<Grade> grades;
@@ -103,6 +115,7 @@ namespace GPACalculator
                     gradeString[3] = grade.Credits.ToString();
                     gradeString[4] = grade.IsAP.ToString();
                     gradeString[5] = grade.IsHonors.ToString();
+
                     var listViewItem = new ListViewItem(gradeString);
                     listView1.Items.Add(listViewItem);
                 }
@@ -115,6 +128,8 @@ namespace GPACalculator
             {
                 return;
             }
+
+            
 
             decimal freshTotalCredits = 0m;
             List<decimal> freshGPA = new List<decimal>();
@@ -130,124 +145,119 @@ namespace GPACalculator
 
             List<Grade> grades;
             grades = Grade.Deserialize("UserSaved.xml");
+
             foreach (Grade grade in grades)
             {
-                switch(grade.Year.ToString())
+                switch (grade.Year.ToString())
                 {
                     case "1":
                         {
                             freshTotalCredits = freshTotalCredits + grade.Credits;
-                            freshGPA.Add(Calc_GPA(grade));
+                            freshGPA.Add(Calc_GPA(grade) * grade.Credits);
                             break;
                         }
                     case "2":
                         {
                             sophTotalCredits += grade.Credits;
-                            sophGPA.Add(Calc_GPA(grade));
+                            sophGPA.Add(Calc_GPA(grade) * grade.Credits);
                             break;
                         }
                     case "3":
                         {
                             juniorTotalCredits += grade.Credits;
-                            juniorGPA.Add(Calc_GPA(grade));
+                            juniorGPA.Add(Calc_GPA(grade) * grade.Credits);
                             break;
                         }
                     case "4":
                         {
                             seniorTotalCredits += grade.Credits;
-                            seniorGPA.Add(Calc_GPA(grade));
+                            seniorGPA.Add(Calc_GPA(grade) * grade.Credits);
                             break;
                         }
                 }
             }
 
-            //look here for errors
-            //my guess is int -> decimal conversion error
-            decimal a_freshGPA = freshGPA.Sum();
-            decimal a_sophGPA = sophGPA.Sum();
-            decimal a_juniorGPA = juniorGPA.Sum();
-            decimal a_seniorGPA = seniorGPA.Sum();
+            //get GPA's
+            //freshman
+            decimal fnl_freshGPA = avgGPA(freshGPA.Sum(), freshTotalCredits);
+            decimal fnl_sophGPA = avgGPA(sophGPA.Sum(), sophTotalCredits);
+            decimal fnl_juniorGPA = avgGPA(juniorGPA.Sum(), juniorTotalCredits);
+            decimal fnl_seniorGPA = avgGPA(seniorGPA.Sum(), seniorTotalCredits);
 
-            decimal a_totalGPA = a_freshGPA + a_sophGPA + a_juniorGPA + a_seniorGPA;
             decimal overallTotalCredits = freshTotalCredits + sophTotalCredits + juniorTotalCredits + seniorTotalCredits;
+            decimal fnl_totalGPA = avgGPA(freshGPA.Sum() + sophGPA.Sum() + juniorGPA.Sum() + seniorGPA.Sum(), overallTotalCredits);
 
-            decimal b_freshGPA = 0;
-            if (freshTotalCredits != 0)
-            {
-                b_freshGPA = a_freshGPA / freshTotalCredits;
-            }
-            decimal b_sophGPA = 0;
-            if (sophTotalCredits != 0)
-            {
-                b_sophGPA = a_sophGPA / sophTotalCredits;
-            }
-            decimal b_juniorGPA = 0;
-            if (juniorTotalCredits != 0)
-            {
-                b_juniorGPA = a_juniorGPA / juniorTotalCredits;
-            }
-            decimal b_seniorGPA = 0;
-            if (seniorTotalCredits != 0)
-            {
-                b_seniorGPA = a_seniorGPA / seniorTotalCredits;
-            }
-            decimal b_totalGPA = 0;
-            if (overallTotalCredits != 0)
-            {
-                b_totalGPA = a_totalGPA / overallTotalCredits;
-            }
-                
-            overallValLabel.Text = b_totalGPA.ToString();
-            freshmanValLabel.Text = b_freshGPA.ToString();
-            sophomoreValLabel.Text = b_sophGPA.ToString();
-            juniorValLabel.Text = b_juniorGPA.ToString();
-            seniorValLabel.Text= b_seniorGPA.ToString();
+            freshmanValLabel.Text = fnl_freshGPA.ToString();
+
+            //debug bullshit
+            //freshmanValLabel.Text = "10";
+            //Console.WriteLine("Part 1 = " +  fnl_freshGPA.ToString());
+
+            sophomoreValLabel.Text = fnl_sophGPA.ToString();
+            juniorValLabel.Text = fnl_juniorGPA.ToString();
+            seniorValLabel.Text = fnl_seniorGPA.ToString();
+            overallValLabel.Text = fnl_totalGPA.ToString();
+
             reqCredits.Text = overallTotalCredits.ToString() + " / 22";
+        }
+
+        private decimal avgGPA(decimal rawGPASum, decimal totalCredits)
+        {
+            if (totalCredits != 0)
+                return rawGPASum / totalCredits;
+            else return 0;
         }
 
         private decimal Calc_GPA(Grade grade)
         {
             decimal amountAdd = 0;
-            if(grade.IsAP)
+            if (grade.IsAP && isUnweighted.Checked == false)
             {
                 amountAdd = 1m;
             }
-            else if (grade.IsHonors)
+            else if (grade.IsHonors && isUnweighted.Checked == false)
             {
                 amountAdd = 0.5m;
             }
-            switch (grade.GradePercent)
+            switch (grade.GradePercent * 100)
             {
-                case >= 97m:
+                case >= 97.0m:
                     return 4.0m + amountAdd;
-                case >= 93m:
+                case >= 93.0m:
                     return 4.0m + amountAdd;
-                case >= 90m:
+                case >= 90.0m:
                     return 3.7m + amountAdd;
-                case >= 87m:
+                case >= 87.0m:
                     return 3.3m + amountAdd;
-                case >= 83m:
+                case >= 83.0m:
                     return 3m + amountAdd;
-                case >= 80m:
+                case >= 80.0m:
                     return 2.7m + amountAdd;
-                case >= 77m:
+                case >= 77.0m:
                     return 2.3m + amountAdd;
-                case >= 73m:
+                case >= 73.0m:
                     return 2m + amountAdd;
-                case >= 70m:
+                case >= 70.0m:
                     return 1.7m + amountAdd;
-                case >= 67m:
+                case >= 67.0m:
                     return 1.3m + amountAdd;
-                case >= 65m:
+                case >= 65.0m:
                     return 1.0m + amountAdd;
-                case < 65:
+                case < 65.0m:
                     return 0m;
             }
         }
 
         private void overallLabel_Click(object sender, EventArgs e)
         {
+            //nothing
+        }
 
+        //weighted?
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            Load_ListView();
+            Load_Calculations();
         }
     }
 }
